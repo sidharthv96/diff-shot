@@ -23,7 +23,9 @@ Or append .diff to a GitHub Pull Request URL
 		}
 		const diffJson = parse(text);
 		images = await Promise.all(
-			diffJson.filter((file) => !ignoreFiles.some((i) => file.newName.endsWith(i))).map(renderFile)
+			diffJson
+				.filter((file) => !ignoreFiles.some((i) => file.newName.endsWith(i)))
+				.map((f) => renderFile(f))
 		);
 	};
 
