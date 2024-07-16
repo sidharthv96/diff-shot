@@ -111,7 +111,7 @@ Or append .diff to a GitHub Pull Request URL
 	</div>
 	<div class="w-full grow flex gap-4 overflow-hidden">
 		<div class="flex flex-col w-1/3 h-full overflow-hidden shadow">
-			<textarea class="w-full h-full p-4" rows="10" bind:value={code}></textarea>
+			<textarea class="w-full h-full p-4 font-mono" rows="10" bind:value={code}></textarea>
 			<!-- <div class=" w-full flex gap-2 justify-center p-2">
 				<button
 					class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
