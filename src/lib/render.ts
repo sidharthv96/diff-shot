@@ -45,7 +45,7 @@ export const renderFile = async (file: DiffFile, config: Partial<Config> = {}) =
 			rect.setAttribute('height', charHeight.toString());
 
 			// TODO: Detect comments properly
-			const isComment = content.trim().startsWith('//');
+			const isComment = content.match(/^\s*(\/\/|#|\/\*|\*|--|;).*$/) !== null;
 			let fill = '';
 			if (type === 'context') {
 				rect.setAttribute('class', 'context opacity-50');
