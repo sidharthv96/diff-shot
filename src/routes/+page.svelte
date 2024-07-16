@@ -6,7 +6,13 @@
 	import type { DiffFile } from 'diff2html/lib/types';
 	import { sha256 } from '$lib/hash';
 
-	let code = `Paste your diff here \nThen click on each file to download the image`;
+	let code = `Paste your diff here
+Then click on each file to download the image
+
+To get diff, run git diff <commit-hash>
+Or append .diff to a GitHub Pull Request URL
+
+`;
 
 	let container: HTMLDivElement;
 
@@ -55,10 +61,12 @@
 				rect.setAttribute('width', lineWidth.toString());
 				rect.setAttribute('height', charHeight.toString());
 
+				// TODO: Detect comments properly
 				const isComment = content.trim().startsWith('//');
-				let fill = 'transparent';
+				let fill = '';
 				if (type === 'context') {
-					rect.setAttribute('class', 'context');
+					rect.setAttribute('class', 'context opacity-50');
+					fill = '#efefef';
 				} else if (type === 'insert') {
 					fill = isComment ? '#afa' : '#00ff00';
 					rect.setAttribute('class', 'added');
@@ -71,14 +79,12 @@
 				yOffset += charHeight;
 			});
 		});
+		svg.setAttribute('viewBox', `0 0 ${width} ${yOffset}`);
 
 		return { svg, width, height: yOffset, name: await sha256(file.oldName, file.newName) };
 	};
 
-	let data: {
-		svgs: { svg: SVGElement; width: number; height: number; name: string }[];
-		width: number;
-	} = { svgs: [], width: 0 };
+	let data: { svg: SVGElement; width: number; height: number; name: string }[] = [];
 
 	const handle = async (text: string) => {
 		if (!browser || !container) return { svgs: [], width: 0 };
@@ -86,11 +92,7 @@
 		const svgs = await Promise.all(
 			diffJson.filter((file) => !ignoreFiles.some((i) => file.newName.endsWith(i))).map(renderFile)
 		);
-		const width = svgs.reduce((acc, { width }) => Math.max(acc, width), 0);
-		for (const { svg, height } of svgs) {
-			svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-		}
-		data = { svgs, width };
+		data = svgs;
 	};
 
 	$: handle(code);
@@ -123,7 +125,7 @@
 			class="diff-container p-4 w-2/3 overflow-auto flex gap-2 items-center justify-center flex-wrap"
 			bind:this={container}
 		>
-			{#each data.svgs as { svg, name }}
+			{#each data as { svg, name }}
 				<button
 					id={name}
 					title="Click to download"
