@@ -1,14 +1,35 @@
 import type { DiffFile } from 'diff2html/lib/types';
 import { sha256 } from './hash';
+import type { Config } from './types';
 
-export const renderFile = async (file: DiffFile) => {
+const defaultConfig: Config = {
+	spaceBetweenLines: 0,
+	charHeight: 20,
+	charWidth: 10,
+	insertColor: '#00ff00',
+	insertCommentColor: '#afa',
+	deleteColor: '#ff0000',
+	deleteCommentColor: '#faa',
+	contextColor: '#efefef'
+};
+
+export const renderFile = async (file: DiffFile, config: Partial<Config> = {}) => {
+	const {
+		spaceBetweenLines,
+		charHeight,
+		charWidth,
+		contextColor,
+		insertColor,
+		insertCommentColor,
+		deleteColor,
+		deleteCommentColor
+	} = { ...defaultConfig, ...config };
+
 	const svgNamespace = 'http://www.w3.org/2000/svg';
 	const svg = document.createElementNS(svgNamespace, 'svg');
 	svg.setAttribute('class', 'max-w-full max-h-full');
 	let width = 0;
 	let yOffset = 0;
-	const charHeight = 20;
-	const charWidth = 10;
 	file.blocks.forEach((block) => {
 		block.lines.forEach((line) => {
 			const type = line.type;
@@ -28,17 +49,17 @@ export const renderFile = async (file: DiffFile) => {
 			let fill = '';
 			if (type === 'context') {
 				rect.setAttribute('class', 'context opacity-50');
-				fill = '#efefef';
+				fill = contextColor;
 			} else if (type === 'insert') {
-				fill = isComment ? '#afa' : '#00ff00';
+				fill = isComment ? insertCommentColor : insertColor;
 				rect.setAttribute('class', 'added');
 			} else if (type === 'delete') {
-				fill = isComment ? '#faa' : '#ff0000';
+				fill = isComment ? deleteCommentColor : deleteColor;
 				rect.setAttribute('class', 'removed');
 			}
 			rect.setAttributeNS(null, 'fill', fill);
 			svg.appendChild(rect);
-			yOffset += charHeight;
+			yOffset += charHeight + spaceBetweenLines;
 		});
 	});
 	svg.setAttribute('viewBox', `0 0 ${width} ${yOffset}`);
