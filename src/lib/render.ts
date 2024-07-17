@@ -7,10 +7,10 @@ const defaultConfig: Config = {
 	charHeight: 20,
 	charWidth: 10,
 	insertColor: '#00ff00',
-	insertCommentColor: '#afa',
 	deleteColor: '#ff0000',
-	deleteCommentColor: '#faa',
-	contextColor: '#efefef'
+	contextColor: '#efefef',
+	commentOpacity: '0.5',
+	contextOpacity: '0.5'
 };
 
 export const renderFile = async (file: DiffFile, config: Partial<Config> = {}) => {
@@ -20,9 +20,9 @@ export const renderFile = async (file: DiffFile, config: Partial<Config> = {}) =
 		charWidth,
 		contextColor,
 		insertColor,
-		insertCommentColor,
 		deleteColor,
-		deleteCommentColor
+		commentOpacity,
+		contextOpacity
 	} = { ...defaultConfig, ...config };
 
 	const svgNamespace = 'http://www.w3.org/2000/svg';
@@ -48,14 +48,18 @@ export const renderFile = async (file: DiffFile, config: Partial<Config> = {}) =
 			const isComment = content.match(/^\s*(\/\/|#|\/\*|\*|--|;).*$/) !== null;
 			let fill = '';
 			if (type === 'context') {
-				rect.setAttribute('class', 'context opacity-50');
+				rect.setAttribute('class', 'context');
+				rect.setAttribute('opacity', contextOpacity);
 				fill = contextColor;
 			} else if (type === 'insert') {
-				fill = isComment ? insertCommentColor : insertColor;
+				fill = insertColor;
 				rect.setAttribute('class', 'added');
 			} else if (type === 'delete') {
-				fill = isComment ? deleteCommentColor : deleteColor;
+				fill = deleteColor;
 				rect.setAttribute('class', 'removed');
+			}
+			if (isComment) {
+				rect.setAttribute('opacity', commentOpacity);
 			}
 			rect.setAttributeNS(null, 'fill', fill);
 			svg.appendChild(rect);

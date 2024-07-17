@@ -10,8 +10,8 @@ export interface Config {
 	charHeight: number;
 	charWidth: number;
 	insertColor: string;
-	insertCommentColor: string;
 	deleteColor: string;
-	deleteCommentColor: string;
 	contextColor: string;
+	commentOpacity: string;
+	contextOpacity: string;
 }
