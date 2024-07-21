@@ -68,5 +68,5 @@ export const renderFile = async (file: DiffFile, config: Partial<Config> = {}) =
 	});
 	svg.setAttribute('viewBox', `0 0 ${width} ${yOffset}`);
 
-	return { svg, width, height: yOffset, name: await sha256(file.oldName, file.newName) };
+	return { svg, width, height: yOffset, name: `i${await sha256(file.oldName, file.newName)}` };
 };
